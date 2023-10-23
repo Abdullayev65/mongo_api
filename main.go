@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"strconv"
 )
 
 func main() {
@@ -45,7 +46,9 @@ func main() {
 	})
 	e.GET("/get", func(c *gin.Context) {
 		data := make([]*Post, 0)
-		cur, err := posts.Find(c.Request.Context(), bson.D{})
+		limit, _ := strconv.Atoi(c.Query("limit"))
+		lmt := int64(limit)
+		cur, err := posts.Find(c.Request.Context(), bson.D{}, &options.FindOptions{Limit: &lmt})
 		if err != nil {
 			c.String(400, err.Error())
 			return
